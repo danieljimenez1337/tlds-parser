@@ -1,10 +1,7 @@
 import json
 from copy import deepcopy
-from PIL import Image
-import matplotlib.pyplot as plt
-from matplotlib.patches import Rectangle
+import sys
 import numpy as np
-import matplotlib.animation as animation
 from typing import List
 
 class BoundaryBox():
@@ -42,10 +39,16 @@ class Line(BoundaryBox):
         self.__text=""
     
     def addText(self,text: str):
-        self.__text += text + " "
+        if self.__text=="":
+            self.__text += text
+        else:
+            self.__text += " " + text 
 
     def getText(self) -> str:
         return self.__text
+    
+    def getCharWidth(self)->float:
+        return self.getWidth()/len(self.__text)
 
 
 class Region(BoundaryBox):
@@ -80,6 +83,32 @@ class ParsedImage():
             for region in page.regions:
                 for line in region.lines:
                     print(line.getText())
+    
+    def getText(self):
+        paragraphs = []
+        paragraph =[]
+        for page in self.pages:
+            for region in page.regions:
+                for line in region.lines:
+                    if lineIsIndented(region,line):
+                        paragraphs.append(paragraph)
+                        paragraph = [line.getText()]
+                    else:
+                        paragraph.append(line.getText())
+        
+        paragraphs.append(paragraph)
+        return {"paragraphs":paragraphs}
+
+def percentError(actual: float, expected: float) -> float:
+    return abs((actual-expected)/expected)*100
+
+def lineIsIndented(region ,line)->bool: 
+    diff = abs(region.getX() - line.getX())
+    cW = line.getCharWidth()
+    if diff > 3* cW and diff < 6*cW:
+        return True
+    else:
+        return False
                     
 
 def convertBB(BoundaryBox) -> (int,int,int,int):  
@@ -135,3 +164,17 @@ def convertDataForKmeans(pages: List[Page]) -> np.ndarray:
                     templist.append(lineaverageheight/len(line.words))
                     dataset.append(templist)
     return np.array(dataset)
+
+
+def main():
+    if len(sys.argv)==3:
+        pi = ParsedImage(sys.argv[1])
+        output = pi.getText()
+        with open(sys.argv[2],'w') as fp:
+            json.dump(output,fp)
+    else:
+        print("Please Enter two arguments, json file, name of output")
+
+if __name__ == "__main__":
+    main()
+
