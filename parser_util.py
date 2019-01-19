@@ -146,6 +146,21 @@ def convertJson(jsonFileName:str) -> List[Page]:
                     lineObject.words.append(wordObject)
                     lineObject.addText(wordObject.getText())
     return pages
+def checkBoundaryBoxCollision(box1: BoundaryBox ,box2: BoundaryBox)->bool:
+    b1W = box1.getWidth()
+    b1H = box1.getHeight()
+    b1X = box1.getX()
+    b1Y = box1.getY()
+
+    b2W = box2.getWidth()
+    b2H = box2.getHeight()
+    b2X = box2.getX()
+    b2Y = box2.getY()
+
+    if ((b1X < (b2X + b2W)) and ((b1X + b1W) > b2X) and (b1Y < (b2Y + b2H)) and ((b1Y + b1H) > b2Y)):
+        return True
+    else:
+        return False
 
 def convertDataForKmeans(pages: List[Page]) -> np.ndarray:
     dataset=[]
@@ -180,18 +195,3 @@ if __name__ == "__main__":
     main()
 
 
-def checkBoundaryBoxCollision(box1: BoundaryBox ,box2: BoundaryBox)->bool:
-    b1W = box1.getWidth()
-    b1H = box1.getHeight()
-    b1X = box1.getX()
-    b1Y = box1.getY()
-
-    b2W = box2.getWidth()
-    b2H = box2.getHeight()
-    b2X = box2.getX()
-    b2Y = box2.getY()
-
-    if ((b1X < (b2X + b2W)) and ((b1X + b1W) > b2X) and (b1Y < (b2Y + b2H)) and ((b1Y + b1H) > b2Y)):
-        return True
-    else:
-        return False
