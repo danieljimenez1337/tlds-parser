@@ -7,7 +7,7 @@ from copy import deepcopy
 from typing import List
 
 
-class BoundaryBox():
+class BoundingBox():
     def __init__(self, x: int, y: int, width: int, height: int) -> None:
         self.__x = x
         self.__y = y
@@ -27,7 +27,7 @@ class BoundaryBox():
         return self.__height
 
 
-class Word(BoundaryBox):
+class Word(BoundingBox):
     def __init__(self, text: str, x: int, y: int, width: int, height: int) -> None:
         super().__init__(x, y, width, height)
         self.__text = text
@@ -36,7 +36,7 @@ class Word(BoundaryBox):
         return self.__text
 
 
-class Line(BoundaryBox):
+class Line(BoundingBox):
     def __init__(self, x: int, y: int, width: int, height: int) -> None:
         super().__init__(x, y, width, height)
         self.words = []
@@ -56,7 +56,7 @@ class Line(BoundaryBox):
         return self.getWidth()/len(self.__text)
 
 
-class Region(BoundaryBox):
+class Region(BoundingBox):
     def __init__(self, x: int, y: int, width: int, height: int) -> None:
         super().__init__(x, y, width, height)
         self.lines = []
@@ -155,7 +155,7 @@ def convertJson(jsonFileName: str) -> List[Page]:
     return pages
 
 
-def checkBoundaryBoxCollision(box1: BoundaryBox, box2: BoundaryBox)->bool:
+def checkBoundingBoxCollision(box1: BoundingBox, box2: BoundingBox)->bool:
     b1W = box1.getWidth()
     b1H = box1.getHeight()
     b1X = box1.getX()
