@@ -1,8 +1,9 @@
 import json
 import argparse
-from copy import deepcopy
 import sys
 import numpy as np
+
+from copy import deepcopy
 from typing import List
 
 
@@ -42,7 +43,7 @@ class Line(BoundaryBox):
         self.__text = ""
         self.isolated = True
 
-    def addText(self, text: str):
+    def addText(self, text: str) -> None:
         if self.__text == "":
             self.__text += text
         else:
@@ -51,7 +52,7 @@ class Line(BoundaryBox):
     def getText(self) -> str:
         return self.__text
 
-    def getCharWidth(self)->float:
+    def getCharWidth(self) -> float:
         return self.getWidth()/len(self.__text)
 
 
@@ -83,13 +84,13 @@ class ParsedImage():
     def __init__(self, jsonFileName: str) -> None:
         self.pages = convertJson(jsonFileName)
 
-    def printPages(self):
+    def printPages(self) -> None:
         for page in self.pages:
             for region in page.regions:
                 for line in region.lines:
                     print(line.getText())
 
-    def getText(self):
+    def getText(self) -> dict:
         paragraphs = []
         paragraph = []
         for page in self.pages:
@@ -118,8 +119,8 @@ def lineIsIndented(region, line)->bool:
         return False
 
 
-def convertBB(BoundaryBox) -> (int, int, int, int):
-    bb = list(BoundaryBox.split(","))
+def convertBoundingBox(boundingBoxes: List) -> (int, int, int, int):
+    bb = list(boundingBoxes.split(","))
     x = int(bb[0])
     y = int(bb[1])
     width = int(bb[2])
@@ -128,9 +129,8 @@ def convertBB(BoundaryBox) -> (int, int, int, int):
 
 
 def convertJson(jsonFileName: str) -> List[Page]:
-
-    with open(jsonFileName) as json_data:
-        data = (json.load(json_data))
+    with open(jsonFileName) as jsonData:
+        data = (json.load(jsonData))
 
     pages = []
     for page in data["pages"]:
@@ -140,15 +140,15 @@ def convertJson(jsonFileName: str) -> List[Page]:
         pageObject = Page(language, textAngle, orientation)
         pages.append(pageObject)
         for region in page['regions']:
-            x, y, width, height = convertBB(region["boundingBox"])
+            x, y, width, height = convertBoundingBox(region["boundingBox"])
             regionObject = Region(x, y, width, height)
             pageObject.regions.append(regionObject)
             for line in region["lines"]:
-                x, y, width, height = convertBB(line["boundingBox"])
+                x, y, width, height = convertBoundingBox(line["boundingBox"])
                 lineObject = Line(x, y, width, height)
                 regionObject.lines.append(lineObject)
                 for word in line["words"]:
-                    x, y, width, height = convertBB(word["boundingBox"])
+                    x, y, width, height = convertBoundingBox(word["boundingBox"])
                     wordObject = Word(word["text"], x, y, width, height)
                     lineObject.words.append(wordObject)
                     lineObject.addText(wordObject.getText())
@@ -177,18 +177,18 @@ def convertDataForKmeans(pages: List[Page]) -> np.ndarray:
     for page in pages:
         for region in page.regions:
                 for line in region.lines:
-                    templist = []
-                    lineaveragewidth = 0
-                    lineaverageheight = 0
-                    charctercount = 0
+                    tempList = []
+                    lineAverageWidth = 0
+                    lineAverageHeight = 0
+                    characterCount = 0
                     for word in line.words:
-                        lineaveragewidth += word.width
-                        lineaverageheight += word.height
-                        charctercount += len(word.text)
+                        lineAverageWidth += word.width
+                        lineAverageHeight += word.height
+                        characterCount += len(word.text)
 
-                    templist.append(lineaveragewidth/charctercount)
-                    templist.append(lineaverageheight/len(line.words))
-                    dataset.append(templist)
+                    tempList.append(lineAverageWidth/characterCount)
+                    tempList.append(lineAverageHeight/len(line.words))
+                    dataset.append(tempList)
     return np.array(dataset)
 
 
