@@ -1,18 +1,29 @@
 # Lemillion-Parser
 
-This is a Optical Character Regcognition Parser using Microsoft Computer Vision APi. This will remove extrenous information from a
-document.
+This is an Optical Character Regcognition Parser written in **Python 3** using Microsoft Computer Vision API. This will remove extraneous information from a document, parse it for information, and return it in a json format ready to be used by the other components.
 
-## Getting Started
+## Dependencies
 
-Some of files will require Matplotlib for plotting the data.
+Can be installed using pip:
 
-## Input file
-### pages
-An array of dictionaries, where each dict is a file returned by  Microsoft Computer Vision APi OCR.
+- Matplotlib: for plotting data
 
-### Example
+## How to use
+
+As of right now there is only one working feature. This is called using the parser_util file. You give the name and path of the json you wish to import, then the name and path of the ouput file.
+
+```python
+# change path format if on Windows
+python3 parser_util.py ./testdata/data.json ./outputs/out.json
 ```
+
+### Input file
+
+The input file will be a json containing an array of dictionaries, where each dict is a file returned by Microsoft Computer Vision OCR service and represent the raw content of users' photos. The array need to have the same order as the users' inputs. The dict needs to contain information about languages, orientation, text angle, these info can be obtained by setting the correct parameters in the POST request for the Microsoft Service.
+
+#### Example
+
+```json
   {
      "pages":[
         {
@@ -82,13 +93,13 @@ An array of dictionaries, where each dict is a file returned by  Microsoft Compu
   }
 ```
 
-## Output file
-### paragraphs
+### Output file
 
-An array of paragraphs represented by array of lines. 
+The output json file will contain an array of paragraphs, each paragraph is represented by an array of lines, each line represented by a string.
 
-### Example
-```
+#### Example
+
+```json
 {
    "paragraphs":[
       [
@@ -124,11 +135,4 @@ An array of paragraphs represented by array of lines.
       ]
    ]
 }
-```
-### How to use
-
-As of right now there only one working feature. This is called  using the parser_util file. You give the name and path of the json you wish to import Then the name and path of the ouput file.
-
-```
-python parser_util.py .\testdata\data.json .\outputs\out.json
 ```
