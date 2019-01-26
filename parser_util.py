@@ -121,15 +121,15 @@ class ParsedImage():
 
     def getText(self) -> dict:
         paragraphs = []
-        paragraph = []
+        paragraph = ""
         for page in self.__pages:
             for region in page.getRegions():
                 for line in region.getLines():
                     if lineIsIndented(region, line):
                         paragraphs.append(paragraph)
-                        paragraph = [line.getText()]
+                        paragraph = line.getText().replace("-","")
                     else:
-                        paragraph.append(line.getText())
+                        paragraph += line.getText().replace("-","")
 
         paragraphs.append(paragraph)
         return {"paragraphs": paragraphs}
