@@ -94,32 +94,41 @@ def plot(dataset, history_centroids, belongs_to):
 
                 plt.show()
 
-def execute(dataset):
+def execute(dataset,data):
     
-    centroids, history_centroids, belongs_to = kmeans(3,dataset)
+    centroids, history_centroids, belongs_to = kmeans(2,dataset)
     #plot the results
-    plot(dataset, history_centroids, belongs_to)
+    #plot(dataset, history_centroids, belongs_to)
+    count = 0 
+    for page in data["pages"]:
+        for region in page["regions"]:
+                for line in region["lines"]:
+                    line.cluster=belongs_to[count]
+                    count +=1
+                    
+                    
 
 jsonFileName = "testdata/data.json"
 with open(jsonFileName) as json_data:
     data = json.load(json_data)
 
 dataset = []    
-for region in data["regions"]:
-        for line in region["lines"]:
-            templist = []
-            lineaveragewidth = 0
-            charctercount = 0
-            linebox =  convert(line["boundingBox"])
-            for word in line["words"]:
-                wordbox = convert(word["boundingBox"])
-                lineaveragewidth += int(wordbox[2])
-                charctercount += len(word["text"])
-            templist.append(lineaveragewidth/charctercount)
-            templist.append(int(linebox[3]))
-            dataset.append(templist)
+for page in data["pages"]:
+    for region in page["regions"]:
+            for line in region["lines"]:
+                templist = []
+                lineaveragewidth = 0
+                charctercount = 0
+                linebox =  convert(line["boundingBox"])
+                for word in line["words"]:
+                    wordbox = convert(word["boundingBox"])
+                    lineaveragewidth += int(wordbox[2])
+                    charctercount += len(word["text"])
+                templist.append(lineaveragewidth/charctercount)
+                templist.append(int(linebox[3]))
+                dataset.append(templist)
 
 dataset = np.array(dataset)
 print("executing")
-execute(dataset)
+execute(dataset,data)
                 
