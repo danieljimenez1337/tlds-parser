@@ -5,6 +5,10 @@ import numpy as np
 from copy import deepcopy
 from typing import List
 
+import matplotlib.pyplot as plt
+from matplotlib.patches import Rectangle
+from PIL import Image
+
 
 class BoundingBox():
     def __init__(self, rawBoundingBox: dict) -> None:
@@ -14,7 +18,19 @@ class BoundingBox():
         self.__y = int(bb[1])
         self.__width = int(bb[2])
         self.__height = int(bb[3])
+    
+    def __eq__(self,other):
+        if self.getX() == other.getX() and self.getY() == other.getY():
+            return True
+        else:
+            return False
 
+    def __ne__(self,other):
+        if self == other:
+            return False
+        else:
+            return True
+    
     def getX(self) -> int:
         return self.__x
 
@@ -27,6 +43,31 @@ class BoundingBox():
     def getHeight(self) -> int:
         return self.__height
 
+
+class enlargedBB():
+    def __init__(self,BB: BoundingBox)-> None:
+        if BB.getWidth() >= BB.getHeight():
+            self.__x = int(round(BB.getX() - (BB.getWidth()/8)))
+            self.__y = int(round(BB.getY() - (BB.getHeight()/2)))
+            self.__width = int(round(BB.getWidth() + (BB.getWidth()/4)))
+            self.__height = int(round(BB.getHeight() + (BB.getHeight()/2)))
+        else:
+            self.__x = int(round(BB.getX() - (BB.getWidth()/2)))
+            self.__y = int(round(BB.getY() - (BB.getHeight()/2)))
+            self.__width = int(round(BB.getWidth() + (BB.getWidth())))
+            self.__height = int(round(BB.getHeight() + (BB.getHeight())))
+    
+    def getX(self) -> int:
+        return self.__x
+
+    def getY(self) -> int:
+        return self.__y
+
+    def getWidth(self) -> int:
+        return self.__width
+
+    def getHeight(self) -> int:
+        return self.__height
 
 class Word(BoundingBox):
     def __init__(self, rawWord: dict) -> None:
@@ -43,6 +84,7 @@ class Line(BoundingBox):
         self.__words = []
         self.__text = ""
         self.isolated = True
+        self.__enlargedBB = enlargedBB(self)
 
         for word in rawLine["words"]:
             wordObject = Word(word)
@@ -63,6 +105,10 @@ class Line(BoundingBox):
 
     def getWords(self) -> List[Word]:
         return self.__words
+    
+    def getEnlargedBB(self):
+        return self.__enlargedBB
+
 
 
 class Region(BoundingBox):
@@ -109,6 +155,8 @@ class ParsedImage():
             data = (json.load(jsonData))
             for page in data["pages"]:
                 self.__pages.append(Page(page))
+        self.checkIsolation()
+        #self.displayLines("./testdata/test-image.jpg", enlarged=True)
 
     def printPages(self) -> None:
         for page in self.__pages:
@@ -119,21 +167,69 @@ class ParsedImage():
     def getPages(self) -> List[Page]:
         return self.__pages
 
-    def getText(self) -> dict:
-        paragraphs = []
-        paragraph = ""
+    def displayLines(self,imageFileName, enlarged = False):
+        plt.figure(figsize=(8,9))
+        image  = Image.open(imageFileName)
+        ax     = plt.imshow(image, alpha=0.5)
         for page in self.__pages:
             for region in page.getRegions():
                 for line in region.getLines():
-                    if lineIsIndented(region, line):
-                        paragraphs.append(paragraph)
-                        paragraph = line.getText().replace("-","")
+                    if enlarged:
+                        bb = line.getEnlargedBB()
                     else:
-                        paragraph += line.getText().replace("-","")
+                        bb = line
+
+                    origin = (bb.getX(), bb.getY())
+                    patch  = Rectangle(origin, bb.getWidth(), bb.getHeight(), fill=False, linewidth=1, color='b')
+                    ax.axes.add_patch(patch)
+
+        _ = plt.axis("off")
+        plt.show()
+
+    def getText(self) -> dict:
+        paragraphs = []
+        paragraph = ""
+        hypen = False
+        for page in self.__pages:
+            for region in page.getRegions():
+                for line in region.getLines():
+                    if  not line.isolated:
+                        lineTxt = line.getText()
+                        if lineIsIndented(region, line):
+                            hypen = False
+                            paragraphs.append(paragraph)
+                            if lineTxt[len(lineTxt)-1] == "-":
+                                paragraph = lineTxt[:-1]
+                                hypen = True
+                            else:
+                                paragraph = lineTxt
+                        else:
+                            if not hypen:
+                                lineTxt = " " + lineTxt
+                            else:
+                                hypen = False
+
+                            if lineTxt[len(lineTxt)-1] == "-":
+                                paragraph += lineTxt[:-1]
+                                hypen = True
+                            else:
+                                paragraph += lineTxt
+                        
 
         paragraphs.append(paragraph)
         return {"paragraphs": paragraphs}
 
+    def checkIsolation(self):
+        for page1 in self.getPages():
+            for region1 in page1.getRegions():
+                for line1 in region1.getLines():
+                    for page2 in self.getPages():
+                        for region2 in page2.getRegions():
+                            for line2 in region2.getLines():
+                                if (line1 != line2 and checkBoundingBoxCollision(line1.getEnlargedBB(),line2.getEnlargedBB()) ):
+                                    line1.isolated = False
+                            
+                                    
 
 def percentError(actual: float, expected: float) -> float:
     return abs((actual-expected)/expected)*100
