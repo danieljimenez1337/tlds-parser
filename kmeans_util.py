@@ -107,8 +107,7 @@ def getClusterMean(cluster):
         return distance/len(cluster["dataPoints"])
     except ZeroDivisionError:
         print("zero sized cluster")
-        print(cluster)
-        return 0
+        return None
     
 
 def plotElbowMethod(datas):
@@ -121,7 +120,7 @@ def plotElbowMethod(datas):
         ax.plot(x, y, "bo")
     plt.show()
 
-def elbowMethod(dataSet, maxK = 8):
+def elbowMethod(dataSet, maxK = 8,plot =False):
     datas = []
     for i in range(1,maxK+1):
         data = {}
@@ -134,15 +133,20 @@ def elbowMethod(dataSet, maxK = 8):
             mean = getClusterMean(cluster)
             for dataPoint in cluster["dataPoints"]:
                 data['sse'] += (euclidian(dataPoint,cluster["centriod"]) - mean )**2
-        datas.append(data)  
-    plotElbowMethod(datas)
+        datas.append(data)
+    
+    #plots elbow curve
+    if plot:      
+        plotElbowMethod(datas)
+
+    #gets line of starting and end points
     m,b = getLine(0,datas[0]['sse'],len(datas)-1,datas[len(datas)-1]['sse'])
     best = 0
     length = 0
 
     for i in range(len(datas)):
         y = m*i +b
-        print(y-datas[i]["sse"])
+        #print(y-datas[i]["sse"])
         if y - datas[i]["sse"] > length:
             best = i
             length = y - datas[i]["sse"]

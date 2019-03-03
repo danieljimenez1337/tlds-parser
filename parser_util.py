@@ -1,6 +1,6 @@
 import json
-import argparse
 import numpy as np
+import kmeans_util as ku
 
 from copy import deepcopy
 from typing import List
@@ -8,7 +8,7 @@ from typing import List
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from PIL import Image
-
+from collections import Counter
 
 class BoundingBox():
     def __init__(self, rawBoundingBox: dict) -> None:
@@ -155,6 +155,14 @@ class ParsedImages():
         for page in data["pages"]:
             self.__pages.append(Page(page))
 
+        self.__dataSet = convertDataForKmeans(self.getPages())
+        self.__clusterData = ku.clusteredData(self.__dataSet)
+        self.__belongsTo = self.__clusterData.getBelongsTo().tolist()
+        l = []
+        for dataPoint in self.__belongsTo:
+            l.append(int(dataPoint[0]))
+        self.__belongsTo = l
+        self.__commonCluster = Counter(self.__belongsTo).most_common(1)[0][0]
         self.checkIsolation()
         #self.displayLines("./testdata/test-image.jpg", enlarged=True)
 
@@ -190,10 +198,12 @@ class ParsedImages():
         paragraphs = []
         paragraph = ""
         hypen = False
+        belongsTo = self.__belongsTo
+        index = 0
         for page in self.__pages:
             for region in page.getRegions():
                 for line in region.getLines():
-                    if  not line.isolated:
+                    if  not line.isolated and belongsTo[index] == self.__commonCluster:
                         lineTxt = line.getText()
                         if lineIsIndented(region, line):
                             hypen = False
@@ -214,7 +224,7 @@ class ParsedImages():
                                 hypen = True
                             else:
                                 paragraph += lineTxt
-                        
+                    index += 1
 
         paragraphs.append(paragraph)
         return {"paragraphs": paragraphs}
@@ -261,28 +271,27 @@ def checkBoundingBoxCollision(box1: BoundingBox, box2: BoundingBox)->bool:
         return False
 
 
-def convertDataForKmeans(pages: List[Page]) -> np.ndarray:
-    dataset = []
-    for page in pages:
+def convertDataForKmeans(pages):
+    dataset=[]
+    for page in pages:    
         for region in page.getRegions():
                 for line in region.getLines():
-                    tempList = []
-                    lineAverageWidth = 0
-                    lineAverageHeight = 0
-                    characterCount = 0
+                    templist = []
+                    lineaveragewidth = 0
+                    lineaverageheight = 0
+                    charctercount = 0
                     for word in line.getWords():
-                        lineAverageWidth += word.width
-                        lineAverageHeight += word.height
-                        characterCount += len(word.text)
+                        lineaveragewidth += word.getWidth()
+                        lineaverageheight += word.getHeight()
+                        charctercount += len(word.getText())
 
-                    tempList.append(lineAverageWidth/characterCount)
-                    tempList.append(lineAverageHeight/len(line.getWords()))
-                    dataset.append(tempList)
+                    templist.append(lineaveragewidth/charctercount)
+                    templist.append(lineaverageheight/len(line.getWords()))
+                    dataset.append(templist)
     return np.array(dataset)
 
 
 def parseData(stringJson):
     pi = ParsedImages(stringJson)
     output = json.dumps(pi.getText())
-    
     return output

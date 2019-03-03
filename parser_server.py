@@ -16,7 +16,7 @@ server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
 parser_pb2_grpc.add_LemillionParserServicer_to_server(LemillionParserServicer(),server)
 
-print('Starting server. Listening on port 50051.')
+print('Starting server. Listening on port 50052.')
 server.add_insecure_port('[::]:50052')
 server.start()
 
