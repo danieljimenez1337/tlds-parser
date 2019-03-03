@@ -36,6 +36,18 @@ def kmeans(k: int, dataSet: np.array):
 
     # intializes the centriods at a random starting point
     startingIndexes = np.random.randint(0, numInstances - 1, size=k)
+    unique = False
+    while(not unique):
+        indices = set()
+        unique = True
+        for index in startingIndexes:
+            if index in indices:
+                unique = False
+                startingIndexes = np.random.randint(0, numInstances - 1, size=k)
+                break
+            else:
+                indices.add(index)
+
     centriods = dataSet[startingIndexes]
 
     oldCentriods = np.zeros(centriods.shape)
