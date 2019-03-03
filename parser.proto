@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+message ParseRequest{
+
+    string pages = 1;
+
+}
+
+message ParseReply{
+
+    string text = 1;
+
+}
+
+service LemillionParser{
+
+    rpc parseData(ParseRequest) returns (ParseReply) {}
+}

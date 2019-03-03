@@ -146,15 +146,15 @@ class Page():
         return self.__regions
 
 
-class ParsedImage():
+class ParsedImages():
 
-    def __init__(self, jsonFileName: str) -> None:
+    def __init__(self, stringJson: str) -> None:
         self.__pages = []
+        data = json.loads(stringJson)
 
-        with open(jsonFileName) as jsonData:
-            data = (json.load(jsonData))
-            for page in data["pages"]:
-                self.__pages.append(Page(page))
+        for page in data["pages"]:
+            self.__pages.append(Page(page))
+
         self.checkIsolation()
         #self.displayLines("./testdata/test-image.jpg", enlarged=True)
 
@@ -281,18 +281,8 @@ def convertDataForKmeans(pages: List[Page]) -> np.ndarray:
     return np.array(dataset)
 
 
-def main():
-    parser = argparse.ArgumentParser(description='OCR Parser for Lemillion')
-    parser.add_argument(
-        'inputJSON', help='input json file full path', type=str)
-    parser.add_argument(
-        'outputJSON', help='output json file full path', type=str)
-    args = parser.parse_args()
-
-    pi = ParsedImage(args.inputJSON)
-    output = pi.getText()
-    with open(args.outputJSON, 'w') as fp:
-        json.dump(output, fp)
-
-if __name__ == "__main__":
-    main()
+def parseData(stringJson):
+    pi = ParsedImages(stringJson)
+    output = json.dumps(pi.getText())
+    
+    return output
