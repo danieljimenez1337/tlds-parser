@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 class clusteredData():
     def __init__(self,dataSet)-> None:
         self.__dataSet = dataSet
-        self.__centriods,self.__belongsTo = elbowMethod(dataSet,8,plot=True)
+        self.__centriods,self.__belongsTo = elbowMethod(dataSet,8)
         #self.__centriods,self.__belongsTo = kmeans(3,dataSet)
-        self.plot()
+        #self.plot()
         
     
     def plot(self) -> None:
