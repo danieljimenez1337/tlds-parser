@@ -8,8 +8,8 @@ service Parser {
 }
 
 message ParseRequest {
-  // The pages to parse into paragraphs.
-  repeated string pages = 1;
+  // The pages, formatted in JSON, to parse into paragraphs.
+  repeated string pagesJSON = 1;
 }
 
 message ParseReply {
