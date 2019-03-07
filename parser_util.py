@@ -165,6 +165,7 @@ class ParsedImages():
         self.__commonCluster = Counter(self.__belongsTo).most_common(1)[0][0]
         self.checkIsolation()
         #self.displayLines("./testdata/test-image.jpg", enlarged=True)
+        #self.displayClusteredLines()
 
     def printPages(self) -> None:
         for page in self.__pages:
@@ -192,6 +193,24 @@ class ParsedImages():
                     ax.axes.add_patch(patch)
 
         _ = plt.axis("off")
+        plt.show()
+
+    def displayClusteredLines(self):
+        plt.figure(figsize=(8,9))
+        colors = ['r', 'g','y','b','o']
+        #color=iter(cm.rainbow(np.linspace(0,1,len(self.__clusterData.getCentriods()))))
+        image  = Image.open("testdata\chapter01\chapter01-03.jpg")
+        ax     = plt.imshow(image, alpha=0.5)
+        count = 0
+        bt = self.__belongsTo
+        for page in self.getPages():
+            for region in page.getRegions():
+                for line in region.getLines():
+                    origin = (line.getX(), line.getY())
+                    patch  = Rectangle(origin, line.getWidth() , line.getHeight(), fill=False, linewidth=1, color =colors[int(bt[count])] )
+                    ax.axes.add_patch(patch)
+                    count +=1
+        _ = plt.axis("off") 
         plt.show()
 
     def getText(self) -> dict:
@@ -227,7 +246,7 @@ class ParsedImages():
                     index += 1
 
         paragraphs.append(paragraph)
-        return {"paragraphs": paragraphs}
+        return paragraphs
 
     def checkIsolation(self):
         for page1 in self.getPages():
