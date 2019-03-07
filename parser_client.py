@@ -1,5 +1,5 @@
 import grpc
-
+import json
 # import the generated classes
 import parser_pb2
 import parser_pb2_grpc
@@ -8,16 +8,21 @@ import parser_pb2_grpc
 channel = grpc.insecure_channel('localhost:50052')
 
 # create a stub (client)
-stub = parser_pb2_grpc.LemillionParserStub(channel)
+stub = parser_pb2_grpc.ParserStub(channel)
 
 #get json
-f = open("testdata/data.json","r")
-string = f.read()
+data =[]
+with open('testdata/data.json') as json_data:
+    j = json.load(json_data)["pages"]
+    for x in j:
+        data.append(json.dumps(x))
+
+
 
 # create a valid request message
-string = parser_pb2.ParseRequest(pages = string)
+array = parser_pb2.ParseRequest(pagesJSON = data)
 # make the call
-response = stub.parseData(string)
+response = stub.parse(array)
 
 # et voilà
-print(response.text)
+print(response.paragraphs)

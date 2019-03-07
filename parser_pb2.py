@@ -19,7 +19,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   package='',
   syntax='proto3',
   serialized_options=None,
-  serialized_pb=_b('\n\x0cparser.proto\"\x1d\n\x0cParseRequest\x12\r\n\x05pages\x18\x01 \x01(\t\"\x1a\n\nParseReply\x12\x0c\n\x04text\x18\x01 \x01(\t2<\n\x0fLemillionParser\x12)\n\tparseData\x12\r.ParseRequest\x1a\x0b.ParseReply\"\x00\x62\x06proto3')
+  serialized_pb=_b('\n\x0cparser.proto\"!\n\x0cParseRequest\x12\x11\n\tpagesJSON\x18\x01 \x03(\t\" \n\nParseReply\x12\x12\n\nparagraphs\x18\x01 \x03(\t2/\n\x06Parser\x12%\n\x05parse\x12\r.ParseRequest\x1a\x0b.ParseReply\"\x00\x62\x06proto3')
 )
 
 
@@ -33,9 +33,9 @@ _PARSEREQUEST = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='pages', full_name='ParseRequest.pages', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      name='pagesJSON', full_name='ParseRequest.pagesJSON', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -52,7 +52,7 @@ _PARSEREQUEST = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=16,
-  serialized_end=45,
+  serialized_end=49,
 )
 
 
@@ -64,9 +64,9 @@ _PARSEREPLY = _descriptor.Descriptor(
   containing_type=None,
   fields=[
     _descriptor.FieldDescriptor(
-      name='text', full_name='ParseReply.text', index=0,
-      number=1, type=9, cpp_type=9, label=1,
-      has_default_value=False, default_value=_b("").decode('utf-8'),
+      name='paragraphs', full_name='ParseReply.paragraphs', index=0,
+      number=1, type=9, cpp_type=9, label=3,
+      has_default_value=False, default_value=[],
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR),
@@ -82,8 +82,8 @@ _PARSEREPLY = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=47,
-  serialized_end=73,
+  serialized_start=51,
+  serialized_end=83,
 )
 
 DESCRIPTOR.message_types_by_name['ParseRequest'] = _PARSEREQUEST
@@ -106,18 +106,18 @@ _sym_db.RegisterMessage(ParseReply)
 
 
 
-_LEMILLIONPARSER = _descriptor.ServiceDescriptor(
-  name='LemillionParser',
-  full_name='LemillionParser',
+_PARSER = _descriptor.ServiceDescriptor(
+  name='Parser',
+  full_name='Parser',
   file=DESCRIPTOR,
   index=0,
   serialized_options=None,
-  serialized_start=75,
-  serialized_end=135,
+  serialized_start=85,
+  serialized_end=132,
   methods=[
   _descriptor.MethodDescriptor(
-    name='parseData',
-    full_name='LemillionParser.parseData',
+    name='parse',
+    full_name='Parser.parse',
     index=0,
     containing_service=None,
     input_type=_PARSEREQUEST,
@@ -125,8 +125,8 @@ _LEMILLIONPARSER = _descriptor.ServiceDescriptor(
     serialized_options=None,
   ),
 ])
-_sym_db.RegisterServiceDescriptor(_LEMILLIONPARSER)
+_sym_db.RegisterServiceDescriptor(_PARSER)
 
-DESCRIPTOR.services_by_name['LemillionParser'] = _LEMILLIONPARSER
+DESCRIPTOR.services_by_name['Parser'] = _PARSER
 
 # @@protoc_insertion_point(module_scope)

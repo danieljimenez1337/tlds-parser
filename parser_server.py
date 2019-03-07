@@ -5,16 +5,16 @@ from parser_util import parseData
 import parser_pb2
 import parser_pb2_grpc
 
-class LemillionParserServicer(parser_pb2_grpc.LemillionParserServicer):
+class ParserServicer(parser_pb2_grpc.ParserServicer):
 
-    def parseData(self,request, context):
+    def parse(self,request, context):
         response = parser_pb2.ParseReply()
-        response.text = parseData(request.pages)
+        response.paragraphs[:] = parseData(request.pagesJSON)
         return response
 
 server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
 
-parser_pb2_grpc.add_LemillionParserServicer_to_server(LemillionParserServicer(),server)
+parser_pb2_grpc.add_ParserServicer_to_server(ParserServicer(),server)
 
 print('Starting server. Listening on port 50052.')
 server.add_insecure_port('[::]:50052')

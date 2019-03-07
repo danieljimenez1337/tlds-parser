@@ -148,11 +148,10 @@ class Page():
 
 class ParsedImages():
 
-    def __init__(self, stringJson: str) -> None:
+    def __init__(self, data: List) -> None:
         self.__pages = []
-        data = json.loads(stringJson)
 
-        for page in data["pages"]:
+        for page in data:
             self.__pages.append(Page(page))
 
         self.__dataSet = convertDataForKmeans(self.getPages())
@@ -246,6 +245,7 @@ class ParsedImages():
                     index += 1
 
         paragraphs.append(paragraph)
+        
         return paragraphs
 
     def checkIsolation(self):
@@ -310,7 +310,10 @@ def convertDataForKmeans(pages):
     return np.array(dataset)
 
 
-def parseData(stringJson):
-    pi = ParsedImages(stringJson)
-    output = json.dumps(pi.getText())
+def parseData(data):
+    dataArray = []
+    for jsonString in data:
+        dataArray.append(json.loads(jsonString))
+    pi = ParsedImages(dataArray)
+    output = pi.getText()
     return output

@@ -4,9 +4,10 @@ import grpc
 import parser_pb2 as parser__pb2
 
 
-class LemillionParserStub(object):
-  # missing associated documentation comment in .proto file
-  pass
+class ParserStub(object):
+  """The parser service takes several results from Microsoft OCR and performs
+  clustering to determine which parts are important.
+  """
 
   def __init__(self, channel):
     """Constructor.
@@ -14,33 +15,34 @@ class LemillionParserStub(object):
     Args:
       channel: A grpc.Channel.
     """
-    self.parseData = channel.unary_unary(
-        '/LemillionParser/parseData',
+    self.parse = channel.unary_unary(
+        '/Parser/parse',
         request_serializer=parser__pb2.ParseRequest.SerializeToString,
         response_deserializer=parser__pb2.ParseReply.FromString,
         )
 
 
-class LemillionParserServicer(object):
-  # missing associated documentation comment in .proto file
-  pass
+class ParserServicer(object):
+  """The parser service takes several results from Microsoft OCR and performs
+  clustering to determine which parts are important.
+  """
 
-  def parseData(self, request, context):
-    # missing associated documentation comment in .proto file
-    pass
+  def parse(self, request, context):
+    """Parse several pages and return the important paragraphs.
+    """
     context.set_code(grpc.StatusCode.UNIMPLEMENTED)
     context.set_details('Method not implemented!')
     raise NotImplementedError('Method not implemented!')
 
 
-def add_LemillionParserServicer_to_server(servicer, server):
+def add_ParserServicer_to_server(servicer, server):
   rpc_method_handlers = {
-      'parseData': grpc.unary_unary_rpc_method_handler(
-          servicer.parseData,
+      'parse': grpc.unary_unary_rpc_method_handler(
+          servicer.parse,
           request_deserializer=parser__pb2.ParseRequest.FromString,
           response_serializer=parser__pb2.ParseReply.SerializeToString,
       ),
   }
   generic_handler = grpc.method_handlers_generic_handler(
-      'LemillionParser', rpc_method_handlers)
+      'Parser', rpc_method_handlers)
   server.add_generic_rpc_handlers((generic_handler,))
