@@ -1,18 +1,18 @@
 syntax = "proto3";
 
-message ParseRequest{
-
-    string pages = 1;
-
+// The parser service takes several results from Microsoft OCR and performs
+// clustering to determine which parts are important.
+service Parser {
+  // Parse several pages and return the important paragraphs.
+  rpc parse(ParseRequest) returns (ParseReply) {}
 }
 
-message ParseReply{
-
-    string text = 1;
-
+message ParseRequest {
+  // The pages, formatted in JSON, to parse into paragraphs.
+  repeated string pagesJSON = 1;
 }
 
-service LemillionParser{
-
-    rpc parseData(ParseRequest) returns (ParseReply) {}
+message ParseReply {
+  // The list of important paragraphs from parsing all of the pages.
+  repeated string paragraphs = 1;
 }
