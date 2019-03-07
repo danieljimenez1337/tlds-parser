@@ -1,5 +1,5 @@
 
-all: client
+all: client server
 
 client:
 	go get
