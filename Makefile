@@ -13,5 +13,5 @@ docker:
 	docker run -it puradox/tlds-parser:latest
 
 publish:
-  docker push puradox/tlds-parser:v1.1.0
-  docker push puradox/tlds-parser:latest
+	docker push puradox/tlds-parser:v1.1.0
+	docker push puradox/tlds-parser:latest
